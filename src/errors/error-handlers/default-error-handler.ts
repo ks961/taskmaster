@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { isInDevelopmentMode } from "../../libs/utils";
 import { HttpServerError } from "../../libs/http-response-codes";
 
@@ -11,12 +11,13 @@ import { HttpServerError } from "../../libs/http-response-codes";
 export function defaultErrorHandler(
     error: unknown,
     _req: Request,
-    res: Response
+    res: Response,
+    _next: NextFunction
 ) {
     
     res.status(HttpServerError.InternalServerError.statusCode).json({
         status: "error",
-        error: "unkown",
+        error: "unknown",
         message: "Something went wrong!",
         stackTrace: isInDevelopmentMode() && (error instanceof Error) ?
             error.stack : undefined
