@@ -1,24 +1,23 @@
-import { v1Router } from "..";
 import { Router } from "express";
 import { TeamsController } from "../../../controllers/teams";
 import { isAuthenticated } from "../../../middlewares/isAuthenticated";
 
-export const teamRouter = Router();
+export const teamsRouter = Router();
 
 /**
  * Note: We can pick up userId of user creating the team from jwt info
 */
-teamRouter.post("/", [
+teamsRouter.post("/", [
     isAuthenticated,
     TeamsController.create
 ]);
 
-teamRouter.get("/", [
+teamsRouter.get("/", [
     isAuthenticated,
     TeamsController.members
 ]);
 
-teamRouter.get("/:teamId/invite", [
+teamsRouter.get("/:teamId/invite", [
     isAuthenticated,
-    TeamsController.members
+    TeamsController.invite
 ]);

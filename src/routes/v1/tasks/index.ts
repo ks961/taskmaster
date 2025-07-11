@@ -1,4 +1,3 @@
-import { v1Router } from "..";
 import { Router } from "express";
 import { TasksController } from "../../../controllers/tasks";
 import { isAuthenticated } from "../../../middlewares/isAuthenticated";

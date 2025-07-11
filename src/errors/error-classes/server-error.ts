@@ -1,3 +1,4 @@
+import { AppError } from "./app-error";
 import type { HttpServerError } from "../../libs/http-response-codes";
 
 /**
@@ -6,7 +7,7 @@ import type { HttpServerError } from "../../libs/http-response-codes";
  * @param message - The error message describing the server issue.
  * @param statusCode - Http response code.
  */
-export class ServerError extends Error {
+export class ServerError extends AppError {
     statusCode;
     
     constructor(

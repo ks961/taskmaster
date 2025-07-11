@@ -1,4 +1,3 @@
-import { v1Router } from "..";
 import { Router } from "express";
 import { UserController } from "../../../controllers/users";
 import { isAuthenticated } from "../../../middlewares/isAuthenticated";
@@ -6,7 +5,6 @@ import { isAuthenticated } from "../../../middlewares/isAuthenticated";
 export const usersRouter = Router();
 
 // TODO: Add validation check for incoming payloads.
-
 usersRouter.get("/", [
     isAuthenticated,
     UserController.profile
