@@ -19,9 +19,13 @@ export const task = {
 export const vCreateTask = Validator.object({
     title: task.title,
     dueDate: task.dueDate,
-    description: task.description,
     status: task.status.optional(),
     assignedTo: task.assignedTo.optional(),
+    description: task.description.optional(),
+});
+
+export const vCreateTaskGenQuery = Validator.object({
+    generateDescription: Validator.boolean().optional(),
 });
 
 export const vTaskId = Validator.object({

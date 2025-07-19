@@ -14,12 +14,15 @@ import { TaskRepository } from "../repositories/mongo/task/task.repository";
 import { TeamRepository } from "../repositories/mongo/team/team.repositoty";
 import { UserRepository } from "../repositories/mongo/user/user.repository";
 import { AuthService } from "../services/auth";
+import { ChatAI } from "../services/chat-ai/ChatAI";
+import { ChatGPTService, GPTResponse } from "../services/chat-ai/chatgpt-service";
 import { InviteService } from "../services/invite";
 import { MemDB } from "../services/memdb";
 import { RedisService } from "../services/memdb/redis-service";
 import { BcryptJSService } from "../services/password/bcryptjs-service";
 import { ProjectService } from "../services/project";
 import { ProjectInviteService } from "../services/project-invite";
+import { SockMap } from "../services/sock-map";
 import { TaskService } from "../services/task";
 import { TeamService } from "../services/team";
 import { JWTService } from "../services/token/jwt-service";
@@ -140,6 +143,18 @@ export function setupDI(DI: DIEngine) {
         () => new MemDB(
             new RedisService(config.REDIS_URI)
         )
+    );
+
+    DI.registerSingleton(
+        ChatAI,
+        () => new ChatAI<GPTResponse>(
+            new ChatGPTService(config.OPENAI_KEY)
+        )
+    );
+
+    DI.registerSingleton(
+        SockMap,
+        () => new SockMap()
     );
 }
 

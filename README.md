@@ -1,6 +1,6 @@
 # TaskMaster: A Collaborative Task Tracking System
 
-The project involves creating a RESTful API for organizing and tracking tasks within teams and projects using Node.js and Express.js. It includes user authentication and profile management, team creation with invitation and join workflows, project grouping under teams with invitation and join endpoints, and comprehensive task operations such as creation, listing (with status filtering), updating, searching by text, commenting, and file attachments.
+The project involves building a collaborative task management platform using Node.js and Express.js, featuring a RESTful API and real-time updates via Socket.io. It supports user authentication and profile management, team creation with invitation and join workflows, and project grouping under teams with their own invitation and join mechanisms. Tasks can be created, listed (with optional status filtering), updated, searched by text, commented on, and have file attachments. Realtime notifications inform users of task assignments and updates. Additionally, the system integrates with a generative AI service to automatically generate descriptions for newly created tasks, enhancing productivity and consistency.
 
 ---
 
@@ -30,6 +30,7 @@ The project involves creating a RESTful API for organizing and tracking tasks wi
      REDIS_URI=your_redis_uri or redis://localhost:6379
      MONGO_URI=your_mongo_uri
      JWT_SEC=your_jwt_secret
+     OPENAI_KEY=your_openai_api_key
      ```
 
 5. Start the application:
@@ -684,6 +685,7 @@ Creates a new task under the specified project.
 tasksRouter.post("/:projectId", [
     isAuthenticated,
     validate(vProjectId, "params"),
+    validate(vCreateTaskGenQuery, "query"),
     validate(vCreateTask, "body"),
     TasksController.create
 ]);
@@ -694,6 +696,12 @@ tasksRouter.post("/:projectId", [
 * **projectId** (required)
 
   * **Type**: `string`
+
+**Query Parameters:**
+
+* **generateDescription** (optional)
+
+  * **Type**: `boolean`
 
 **Request Body Parameters:**
 
@@ -1038,3 +1046,125 @@ tasksRouter.get("/:taskId/:attachment", [
 **Controller:**
 
 * `TasksController.attachment`: Handles fetching and returning the specified attachment.
+
+Perfect. Based on your setup, here's how the documentation would look under your new section:
+
+---
+
+## Realtime notification with Socket.io
+
+### Event `init:userid`
+
+**Description:**
+Important: Should be Sent by the client immediately after establishing a connection to register their `userId` with the server.
+
+**Client should emit:**
+
+```js
+socket.emit("init:userid", JSON.stringify({ userId: "abc123" }));
+```
+
+**Payload:**
+
+```ts
+{
+    userId: string;
+}
+```
+
+**Server-side behavior:**
+
+* Registers the socket with the userId in `SockMap`.
+* Emits a `error:client` event if the payload is invalid or malformed.
+
+---
+
+### Event `error:client`
+
+**Description:**
+Emitted by the server when the client sends an invalid or malformed event payload.
+
+**Client should listen with:**
+
+```js
+socket.on("error:client", (message) => {
+    console.error("Socket error:", message);
+});
+```
+
+**Payload:**
+
+```ts
+string  // Error message describing the issue
+```
+
+**Emitted by:**
+
+* Server, in response to bad input (e.g. malformed `init:userid` payload).
+
+---
+
+### Event `task:assigned`
+
+**Description:**
+Emitted by the server when a task is assigned to a specific user.
+
+**Client should listen with:**
+
+```js
+socket.on("task:assigned", (payload) => {
+    // handle assigned task
+});
+```
+
+**Payload:**
+
+```ts
+{
+    title: string,
+    taskId: string,
+    projectId: string,
+    taskCreator: string,
+    assignedTo: string,
+    status: "pending" | "completed",
+    dueDate: string,
+    description: string,
+    comments: any[],
+    attachments: any[],
+}
+```
+
+**Emitted by:**
+
+* Server, **to the specific user** via `socket.emit` after they are assigned a task.
+
+---
+
+### Event `task:updated`
+
+**Description:**
+Emitted by the server when a task assigned to the user is updated.
+
+**Client should listen with:**
+
+```js
+socket.on("task:updated", (payload) => {
+    // handle task update
+});
+```
+
+**Payload:**
+
+```ts
+{
+    title?: string,
+    dueDate?: string,
+    description?: string,
+    status?: string,
+    assignedTo?: string
+}
+```
+
+**Emitted by:**
+
+* Server, **to the specific user** whose assigned task has been updated.

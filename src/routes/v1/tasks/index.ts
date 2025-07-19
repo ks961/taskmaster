@@ -6,13 +6,14 @@ import { validate } from "../../../middlewares/validate";
 import { TasksController } from "../../../controllers/tasks";
 import { MulterService } from "../../../services/upload/multer-service";
 import { isAuthenticated } from "../../../middlewares/is-authenticated";
-import { vCreateTask, vTaskAttachment, vTaskComment, vTaskId, vTaskStatus, vTaskText, vTaskUpdate } from "../../../v-schemas/task";
+import { vCreateTask, vCreateTaskGenQuery, vTaskAttachment, vTaskComment, vTaskId, vTaskStatus, vTaskText, vTaskUpdate } from "../../../v-schemas/task";
 
 export const tasksRouter = Router();
 
 tasksRouter.post("/:projectId", [
     isAuthenticated,
     validate(vProjectId, "params"),
+    validate(vCreateTaskGenQuery, "query"),
     validate(vCreateTask, "body"),
     TasksController.create
 ]);

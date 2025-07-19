@@ -37,3 +37,9 @@ export function formatDateToStr(date: Date) {
 export function sha256(value: string) {
     return crypto.createHash('sha256').update(value).digest('hex');
 }
+
+export async function asyncSleep(delay: number) {
+    return new Promise((res, _) => {
+        setTimeout(() => res(""), delay);
+    });
+}

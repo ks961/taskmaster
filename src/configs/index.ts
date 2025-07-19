@@ -37,6 +37,15 @@ export const config = makeReadonly({
             "REDIS URI not found."
         );
         return uri;
+    },
+    get OPENAI_KEY() {
+        const key = process.env.OPENAI_KEY;
+        assertInvalid(
+            key,
+            "OPENAI API key not found."
+        );
+
+        return key;
     }
 });
 

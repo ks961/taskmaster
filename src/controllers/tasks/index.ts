@@ -7,6 +7,11 @@ import { UserService } from "../../services/users";
 import { MulterService } from "../../services/upload/multer-service";
 import { ServerError } from "../../errors/error-classes/server-error";
 import path from "node:path";
+import { ChatAI } from "../../services/chat-ai/ChatAI";
+import { GPTResponse } from "../../services/chat-ai/chatgpt-service";
+import { retry } from "../../libs/retry";
+import { Socket } from "socket.io";
+import { SockMap } from "../../services/sock-map";
 
 export class TasksController {
 
@@ -19,8 +24,33 @@ export class TasksController {
     ) {
         const taskInfo = req.body;
         const projectId = req.params.projectId;
+        const generateDescription = (req.query.generateDescription === "true");
 
         const userId = (req as any).claims.userId;
+
+        const chatAI = DI.resolve(ChatAI<GPTResponse>);
+
+        if(!(taskInfo?.description) && taskInfo.title && generateDescription) {
+            
+            // Note: will retry 2 times on fail, and sleep in b/w calls.
+            const result = await retry(
+                () => chatAI.ask(`Task title: ${taskInfo.title}`),
+                2
+            );
+
+            if(result === null) {
+                throw new ServerError(
+                    "Something went wrong while generating description for task.",
+                    HttpServerError.InternalServerError
+                );
+            }
+            taskInfo.description = result.description;
+        } else if(!(taskInfo?.description) && !generateDescription) {
+            throw new ClientError(
+                "The 'description' field is missing from the task creation request payload.",
+                HttpClientError.BadRequest
+            );
+        }
 
         const taskService = DI.resolve(TaskService);
         const newTask = await taskService.create(
@@ -99,10 +129,18 @@ export class TasksController {
         res: Response
     ) {
         const taskId = req.params.taskId;
-        const updateData = req.body; // should be validated, we don't want unwanted field to be updated
+        const updateData = req.body;
         
+        const userId = (req as any).claims.userId;
+
         const taskService = DI.resolve(TaskService);
         await taskService.updateTaskById(taskId, updateData);
+
+        const sockMap = DI.resolve(SockMap);
+
+        const socket = sockMap.get(userId);
+
+        socket?.emit(`task:updated`, updateData);
 
         res.json({
             status: "success"
@@ -117,9 +155,18 @@ export class TasksController {
         const userId = req.body.userId;
         
         const taskService = DI.resolve(TaskService)
-        await taskService.updateTaskById(taskId, {
+
+        const updatePayload = {
             assignedTo: userId
-        });
+        };
+
+        const task = await taskService.updateTaskById(taskId, updatePayload);
+
+        const sockMap = DI.resolve(SockMap);
+
+        const socket = sockMap.get(userId);
+
+        socket?.emit(`task:assigned`, task);
 
         res.json({
             status: "success"
