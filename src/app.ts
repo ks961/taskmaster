@@ -43,7 +43,7 @@ io.on("connection", (socket: Socket) => {
              * There client is expected to have a global socket.io event
              * to receive error messages at 'client-error' event..
             */
-            socket.emit("client-error", "Bad userid payload")
+            socket.emit("client:error", "Bad userid payload")
         }
     });
 });
