@@ -4,6 +4,14 @@ The project involves building a collaborative task management platform using Nod
 
 ---
 
+## Table of Contents
+
+- [Setup Instructions](#setup-instructions)
+- [API Documentation](#api-documentation)
+- [Realtime notification with Socket.io](#realtime-notification-with-socketio)
+
+---
+
 ## Setup Instructions
 
 1. Clone the repository:
