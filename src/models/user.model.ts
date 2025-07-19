@@ -1,5 +1,6 @@
 import { SecId } from "@d3vtool/secid";
 import mongoose, { InferSchemaType, Schema } from "mongoose";
+import { config } from "../configs";
 
 export const userSchema = new Schema({
     name: {
@@ -10,7 +11,7 @@ export const userSchema = new Schema({
         type: String, 
         required: true,
         immutable: true,
-        default: () => SecId.generate(10), 
+        default: () => SecId.generate(config.ID_LENGTH),
     },
     email: {
         type: String, 
@@ -22,5 +23,6 @@ export const userSchema = new Schema({
     }
 });
 
-export type TUser = InferSchemaType<typeof userSchema>; 
+export type TUser = InferSchemaType<typeof userSchema>;
+
 export const User = mongoose.model('User', userSchema);

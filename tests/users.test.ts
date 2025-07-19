@@ -48,7 +48,7 @@ describe("User Management", () => {
         async() => {
             const response = await server
                 .get("/v1/users")
-                .set("Authorization", `Bearer ${authToken}`);;
+                .set("Authorization", `Bearer ${authToken}`);
 
             expect(response.status).toBe(200);
 
@@ -59,4 +59,61 @@ describe("User Management", () => {
             expect(response.body.user).toHaveProperty("userId");
         }
     )
+    
+    it(
+        "PATCH /v1/users should respond with 200 Ok on successful update.",
+        async() => {
+            const response = await server
+                .patch("/v1/users")
+                .set("Authorization", `Bearer ${authToken}`)
+                .send({name: "NewName"});
+
+
+            expect(response.status).toBe(200);
+
+            expect(response.body["status"]).toBe("success");
+        }
+    )
+
+    it(
+        "PATCH /v1/users should respond with 200 Ok on successful update.",
+        async() => {
+            const response = await server
+                .patch("/v1/users")
+                .set("Authorization", `Bearer ${authToken}`)
+                .send({name: "NewName"});
+
+
+            expect(response.status).toBe(200);
+
+            expect(response.body["status"]).toBe("success");
+        }
+    )
+    
+    it("should logout successfully with 200 OK", async () => {
+        const response = await server
+            .get("/v1/users/logout")
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(response.status).toBe(200);
+        expect(response.body.status).toBe("success");
+    });
+
+    it("should block access to protected route after logout", async () => {
+        const logoutResponse = await server
+            .get("/v1/users/logout")
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(logoutResponse.body).toHaveProperty("error");
+        expect(logoutResponse.body).toHaveProperty("message");
+
+        expect(logoutResponse.body["error"]).toBe("Unauthorized");
+        expect(logoutResponse.body["message"]).toBe("User already been logged out.");
+
+        const response = await server
+            .get("/v1/users")
+            .set("Authorization", `Bearer ${authToken}`);
+
+        expect(response.status).toBe(401);
+    });
 });

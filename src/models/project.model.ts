@@ -1,6 +1,6 @@
+import { config } from "../configs";
 import { SecId } from "@d3vtool/secid";
 import mongoose, { InferSchemaType, Schema } from "mongoose";
-import { User } from "./user.model";
 
 
 const projectSchema = new Schema({
@@ -12,9 +12,9 @@ const projectSchema = new Schema({
         type: String,
         required: true,
         immutable: true,
-        default: () => SecId.generate(10)
+        default: () => SecId.generate(config.ID_LENGTH)
     },
-    owner: {
+    ownerId: {
         type: String,
         required: true
     },

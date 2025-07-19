@@ -1,5 +1,4 @@
-import { NextFunction, Request, Response } from "express";
-
+import crypto from "node:crypto";
 
 export function makeReadonly<T>(obj: T): Readonly<T> {
     return Object.freeze(obj);
@@ -33,4 +32,8 @@ export function formatDateToStr(date: Date) {
     const year = date.getFullYear();
     
     return `${day}/${month}/${year}`;
+}
+
+export function sha256(value: string) {
+    return crypto.createHash('sha256').update(value).digest('hex');
 }

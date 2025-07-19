@@ -1,6 +1,7 @@
 import { SecId } from "@d3vtool/secid";
 import mongoose, { InferSchemaType, Schema } from "mongoose";
 import { User } from "./user.model";
+import { config } from "../configs";
 
 
 const teamSchema = new Schema({
@@ -12,7 +13,7 @@ const teamSchema = new Schema({
         type: String,
         required: true,
         immutable: true,
-        default: () => SecId.generate(10)
+        default: () => SecId.generate(config.ID_LENGTH)
     },
     members: [
         {

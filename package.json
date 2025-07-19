@@ -23,9 +23,12 @@
   "dependencies": {
     "@d3vtool/secid": "^1.1.8",
     "@d3vtool/strict-env": "^4.0.1",
-    "@d3vtool/utils": "^9.0.0",
+    "@d3vtool/utils": "^9.0.2",
+    "@types/multer": "^2.0.0",
     "bcryptjs": "^3.0.2",
     "express": "^5.1.0",
-    "mongoose": "^8.16.3"
+    "ioredis": "^5.6.1",
+    "mongoose": "^8.16.3",
+    "multer": "^2.0.2"
   }
 }
